@@ -1,0 +1,37 @@
+{
+  "name": "@notareum/sdk",
+  "version": "1.0.0",
+  "description": "TypeScript SDK for interacting with the Notareum Protocol",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "tsc --noEmit"
+  },
+  "license": "BUSL-1.1",
+  "author": "Notareum Labs <research@notareum.com>",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/notareum/notareum-ts"
+  },
+  "keywords": ["notareum", "nota", "blockchain", "web3", "sdk", "typescript"],
+  "dependencies": {
+    "@notareum/core": "file:../core",
+    "ethers": "^6.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  }
+}
