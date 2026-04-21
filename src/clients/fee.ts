@@ -6,8 +6,8 @@
  */
 
 import { Contract, type Provider, type Signer } from "ethers";
-import { NotareumFeeManagerABI } from "./abi/index.js";
-import { SignerRequiredError, ContractCallError } from "./errors.js";
+import { NotareumFeeManagerABI } from "../abi/index.js";
+import { SignerRequiredError, ContractCallError } from "../errors.js";
 
 /** Fee configuration from the protocol. */
 export interface FeeConfig {

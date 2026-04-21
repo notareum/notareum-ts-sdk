@@ -6,8 +6,8 @@
  */
 
 import { Contract, type Provider, type Signer } from "ethers";
-import { NotareumValidatorStakingABI } from "./abi/index.js";
-import { SignerRequiredError, ContractCallError } from "./errors.js";
+import { NotareumValidatorStakingABI } from "../abi/index.js";
+import { SignerRequiredError, ContractCallError } from "../errors.js";
 
 /** Validator tier (mirrors NotareumValidatorStaking.Tier). */
 export enum ValidatorTier {

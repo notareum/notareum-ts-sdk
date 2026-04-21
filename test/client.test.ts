@@ -4,12 +4,12 @@
 
 import { describe, it, expect, vi } from "vitest";
 import { Notareum } from "../src/client.js";
-import { RegistryClient } from "../src/registry.js";
-import { VerificationClient } from "../src/verification.js";
-import { StakingClient } from "../src/staking.js";
-import { GovernanceClient } from "../src/governance.js";
-import { FeeClient } from "../src/fee.js";
-import { NotaFileClient } from "../src/nota-file.js";
+import { RegistryClient } from "../src/clients/registry.js";
+import { VerificationClient } from "../src/clients/verification.js";
+import { StakingClient } from "../src/clients/staking.js";
+import { GovernanceClient } from "../src/clients/governance.js";
+import { FeeClient } from "../src/clients/fee.js";
+import { NotaFileClient } from "../src/clients/nota-file.js";
 import type { ClientConfig } from "../src/types.js";
 
 const mockProvider = {

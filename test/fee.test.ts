@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { FeeClient } from "../src/fee.js";
+import { FeeClient } from "../src/clients/fee.js";
 import { SignerRequiredError } from "../src/errors.js";
 
 vi.mock("ethers", async (importOriginal) => {

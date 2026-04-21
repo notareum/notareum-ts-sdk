@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { StakingClient, ValidatorTier } from "../src/staking.js";
+import { StakingClient, ValidatorTier } from "../src/clients/staking.js";
 import { SignerRequiredError } from "../src/errors.js";
 
 vi.mock("ethers", async (importOriginal) => {

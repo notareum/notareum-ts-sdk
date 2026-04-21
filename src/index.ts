@@ -24,18 +24,18 @@ export type { NotareumInstance } from "./client.js";
 export type { ClientConfig, ContractAddresses, CreateNotaOptions, TransactionResult, TransactionReceipt } from "./types.js";
 
 // Sub-clients (for direct instantiation if needed)
-export { RegistryClient } from "./registry.js";
-export { VerificationClient } from "./verification.js";
-export { StakingClient, ValidatorTier } from "./staking.js";
-export { GovernanceClient } from "./governance.js";
-export { FeeClient } from "./fee.js";
-export { NotaFileClient, NotaBuilder } from "./nota-file.js";
+export { RegistryClient } from "./clients/registry.js";
+export { VerificationClient } from "./clients/verification.js";
+export { StakingClient, ValidatorTier } from "./clients/staking.js";
+export { GovernanceClient } from "./clients/governance.js";
+export { FeeClient } from "./clients/fee.js";
+export { NotaFileClient, NotaBuilder } from "./clients/nota-file.js";
 
 // Types from sub-clients
-export type { ValidatorInfo } from "./staking.js";
-export type { VeNOTALock } from "./governance.js";
-export type { FeeConfig } from "./fee.js";
-export type { VerificationRequest } from "./verification.js";
+export type { ValidatorInfo } from "./clients/staking.js";
+export type { VeNOTALock } from "./clients/governance.js";
+export type { FeeConfig } from "./clients/fee.js";
+export type { VerificationRequest } from "./clients/verification.js";
 
 // Error classes
 export {

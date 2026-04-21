@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { GovernanceClient } from "../src/governance.js";
+import { GovernanceClient } from "../src/clients/governance.js";
 import { SignerRequiredError } from "../src/errors.js";
 
 vi.mock("ethers", async (importOriginal) => {

@@ -3,9 +3,9 @@
  */
 
 import { Contract, type Provider, type Signer } from "ethers";
-import { VerificationLevel } from "./core/index.js";
-import { NotareumVerificationEngineABI } from "./abi/index.js";
-import { SignerRequiredError, ContractCallError } from "./errors.js";
+import { VerificationLevel } from "../core/index.js";
+import { NotareumVerificationEngineABI } from "../abi/index.js";
+import { SignerRequiredError, ContractCallError } from "../errors.js";
 
 export interface VerificationRequest {
   resourceId: string;

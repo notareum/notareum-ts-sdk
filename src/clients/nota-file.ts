@@ -14,9 +14,9 @@ import {
   isValidNota,
   ResourceType,
   resolveResourceTypeId,
-} from "./core/index.js";
-import type { NotaFile } from "./core/index.js";
-import type { CreateNotaOptions } from "./types.js";
+} from "../core/index.js";
+import type { NotaFile } from "../core/index.js";
+import type { CreateNotaOptions } from "../types.js";
 
 /** A .nota file builder with fluent chaining. */
 export class NotaBuilder {

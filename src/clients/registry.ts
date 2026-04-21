@@ -3,10 +3,10 @@
  */
 
 import { Contract, type Provider, type Signer } from "ethers";
-import { computeResourceId } from "./core/index.js";
-import type { ResourceInfo } from "./core/index.js";
-import { NotareumNotaRegistryABI } from "./abi/index.js";
-import { SignerRequiredError, ContractCallError } from "./errors.js";
+import { computeResourceId } from "../core/index.js";
+import type { ResourceInfo } from "../core/index.js";
+import { NotareumNotaRegistryABI } from "../abi/index.js";
+import { SignerRequiredError, ContractCallError } from "../errors.js";
 
 export class RegistryClient {
   private readonly contract: Contract;

@@ -36,12 +36,12 @@
  * @author Notareum Labs
  */
 
-import { RegistryClient } from "./registry.js";
-import { VerificationClient } from "./verification.js";
-import { StakingClient } from "./staking.js";
-import { GovernanceClient } from "./governance.js";
-import { FeeClient } from "./fee.js";
-import { NotaFileClient } from "./nota-file.js";
+import { RegistryClient } from "./clients/registry.js";
+import { VerificationClient } from "./clients/verification.js";
+import { StakingClient } from "./clients/staking.js";
+import { GovernanceClient } from "./clients/governance.js";
+import { FeeClient } from "./clients/fee.js";
+import { NotaFileClient } from "./clients/nota-file.js";
 import type { ClientConfig } from "./types.js";
 
 /** The unified Notareum SDK instance. */

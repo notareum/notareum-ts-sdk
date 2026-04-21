@@ -4,7 +4,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { RegistryClient } from "../src/registry.js";
+import { RegistryClient } from "../src/clients/registry.js";
 import { SignerRequiredError } from "../src/errors.js";
 
 // Mock ethers Contract

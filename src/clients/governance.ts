@@ -6,8 +6,8 @@
  */
 
 import { Contract, type Provider, type Signer } from "ethers";
-import { NotareumVeNOTAABI } from "./abi/index.js";
-import { SignerRequiredError, ContractCallError } from "./errors.js";
+import { NotareumVeNOTAABI } from "../abi/index.js";
+import { SignerRequiredError, ContractCallError } from "../errors.js";
 
 /** A veNOTA lock record. */
 export interface VeNOTALock {
