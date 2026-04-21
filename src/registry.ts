@@ -3,8 +3,8 @@
  */
 
 import { Contract, type Provider, type Signer } from "ethers";
-import { computeResourceId } from "@notareum/core";
-import type { ResourceInfo } from "@notareum/core";
+import { computeResourceId } from "./core/index.js";
+import type { ResourceInfo } from "./core/index.js";
 import { NotareumNotaRegistryABI } from "./abi/index.js";
 import { SignerRequiredError, ContractCallError } from "./errors.js";
 

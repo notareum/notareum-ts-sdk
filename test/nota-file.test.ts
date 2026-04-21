@@ -4,7 +4,7 @@
 
 import { describe, it, expect } from "vitest";
 import { NotaFileClient, NotaBuilder } from "../src/nota-file.js";
-import { ResourceType } from "@notareum/core";
+import { ResourceType } from "../../src/core/index.js";
 
 const client = new NotaFileClient();
 

@@ -3,7 +3,7 @@
  */
 
 import { Contract, type Provider, type Signer } from "ethers";
-import { VerificationLevel } from "@notareum/core";
+import { VerificationLevel } from "./core/index.js";
 import { NotareumVerificationEngineABI } from "./abi/index.js";
 import { SignerRequiredError, ContractCallError } from "./errors.js";
 
