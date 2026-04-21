@@ -12,7 +12,7 @@
  * ntm.governance.lock(...);
  * ```
  *
- * @license BUSL-1.1
+ * @license MIT
  * @author Notareum Labs
  */
 

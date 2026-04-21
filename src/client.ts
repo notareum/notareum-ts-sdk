@@ -32,7 +32,7 @@
  * await ntm.staking.stake(10_000n * 10n ** 18n);
  * ```
  *
- * @license BUSL-1.1
+ * @license MIT
  * @author Notareum Labs
  */
 

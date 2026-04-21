@@ -1,7 +1,7 @@
 /**
  * FeeClient -- wraps NotareumFeeManager contract.
  *
- * @license BUSL-1.1
+ * @license MIT
  * @author Notareum Labs
  */
 

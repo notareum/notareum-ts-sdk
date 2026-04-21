@@ -1,7 +1,7 @@
 /**
  * NotaFileClient -- .nota file operations wrapping @notareum/core.
  *
- * @license BUSL-1.1
+ * @license MIT
  * @author Notareum Labs
  */
 
