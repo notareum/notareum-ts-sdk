@@ -45,5 +45,30 @@ export {
   ResourceNotFoundError,
 } from "./errors.js";
 
+// Core enums / types commonly used by consumer apps
+export {
+  ResourceType,
+  VerificationStatus,
+  VerificationLevel,
+  resolveResourceTypeId,
+  resolveResourceTypeString,
+  isValidResourceType,
+  registerResourceType,
+} from "./core/nota/types.js";
+export type {
+  NotaFile,
+  NotaChain,
+  NotaResource,
+  NotaVerification,
+  NotaSignature,
+  NotaIssuer,
+  NotaMetadata,
+  ResourceTypeString,
+  VerificationStatusString,
+  VerificationLevelString,
+} from "./core/nota/types.js";
+export type { ResourceInfo } from "./core/registry/types.js";
+export { computeResourceId } from "./core/registry/resource-id.js";
+
 // ABI re-exports
 export * from "./abi/index.js";
