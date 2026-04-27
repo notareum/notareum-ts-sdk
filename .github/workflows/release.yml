@@ -1,4 +1,4 @@
-name: Release
+name: Notareum TypeScript SDK Package Release
 
 on:
   push:
@@ -21,7 +21,7 @@ concurrency:
 
 jobs:
   release:
-    name: semantic-release
+    name: Notareum TypeScript SDK Package Release
     runs-on: ubuntu-latest
     if: github.repository == 'notareum/notareum-ts-sdk'
     steps:
