@@ -1,39 +1,63 @@
 {
   "name": "@notareum/sdk",
   "version": "1.0.0",
-  "description": "TypeScript SDK for interacting with the Notareum Protocol",
+  "description": "Official TypeScript SDK for the Notareum Protocol -- .nota files, on-chain registry, verification, staking, governance, and fees.",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/index.js",
-      "types": "./dist/index.d.ts"
-    }
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
   },
   "files": [
-    "dist"
+    "dist",
+    "README.md",
+    "LICENSE"
   ],
+  "engines": {
+    "node": ">=18"
+  },
+  "sideEffects": false,
   "scripts": {
     "build": "tsc",
+    "clean": "rm -rf dist",
     "test": "vitest run",
     "test:watch": "vitest",
-    "lint": "tsc --noEmit"
+    "lint": "tsc --noEmit",
+    "prepublishOnly": "npm run clean && npm run lint && npm run test && npm run build"
   },
   "license": "MIT",
   "author": "Notareum Labs <research@notareum.com>",
+  "homepage": "https://notareum.com",
   "repository": {
     "type": "git",
-    "url": "https://github.com/notareum/notareum-ts"
+    "url": "git+https://github.com/notareum/notareum-ts-sdk.git"
+  },
+  "bugs": {
+    "url": "https://github.com/notareum/notareum-ts-sdk/issues"
   },
   "keywords": [
     "notareum",
     "nota",
     "blockchain",
     "web3",
+    "ethereum",
+    "ethers",
     "sdk",
-    "typescript"
+    "typescript",
+    "verification",
+    "provenance",
+    "staking",
+    "governance",
+    "rwa"
   ],
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
   "dependencies": {
     "ethers": "^6.0.0"
   },
