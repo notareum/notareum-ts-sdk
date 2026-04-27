@@ -181,9 +181,23 @@ npm run lint       # tsc --noEmit
 
 The project uses strict TypeScript, ESM, and Vitest. All public APIs are covered by tests under `test/`.
 
-## Versioning
+## Versioning & Releases
 
-Semantic Versioning. Breaking changes are reserved for major bumps and noted in [CHANGELOG.md](./CHANGELOG.md) when published.
+Releases are fully automated by [semantic-release](https://semantic-release.gitbook.io) on every push to `main` (and `next` / `beta` / `alpha` for pre-releases). Versioning, changelog, git tag, GitHub release, and npm publish all derive from [Conventional Commits](https://www.conventionalcommits.org/):
+
+| Commit type                | Release  |
+| -------------------------- | -------- |
+| `feat: ...`                | minor    |
+| `fix:` / `perf:` / `revert:` / `refactor:` / `build:` | patch |
+| `BREAKING CHANGE:` footer or `feat!:` / `fix!:` | major |
+| `docs:` / `style:` / `test:` / `ci:` / `chore:` | no release |
+
+Packages are published to npm with [provenance](https://docs.npmjs.com/generating-provenance-statements) attestations. See [CHANGELOG.md](./CHANGELOG.md) for the full release history.
+
+### Required repository secrets
+
+- `NPM_TOKEN` -- npm automation token with publish rights to `@notareum`.
+- `GITHUB_TOKEN` -- provided automatically by GitHub Actions.
 
 ## Companion SDKs
 
