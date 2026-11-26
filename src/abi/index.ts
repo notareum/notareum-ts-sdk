@@ -1,4 +1,5 @@
 export { NotareumNotaRegistryABI } from "./NotareumNotaRegistry.js";
+export { NotareumConformanceGateABI } from "./NotareumConformanceGate.js";
 export { NotareumVerificationEngineABI } from "./NotareumVerificationEngine.js";
 export { NotareumValidatorStakingABI } from "./NotareumValidatorStaking.js";
 export { NotareumSlashingManagerABI } from "./NotareumSlashingManager.js";

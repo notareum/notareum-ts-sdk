@@ -72,7 +72,7 @@ export const NotareumVerificationEngineABI = [
     "inputs": [
       {
         "internalType": "bytes32",
-        "name": "resourceId",
+        "name": "notaId",
         "type": "bytes32"
       }
     ],
@@ -119,6 +119,17 @@ export const NotareumVerificationEngineABI = [
   {
     "inputs": [
       {
+        "internalType": "bytes32",
+        "name": "notaId",
+        "type": "bytes32"
+      }
+    ],
+    "name": "NotVerifiable",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "uint256",
         "name": "requestId",
         "type": "uint256"
@@ -136,17 +147,6 @@ export const NotareumVerificationEngineABI = [
       }
     ],
     "name": "RequestNotFound",
-    "type": "error"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "bytes32",
-        "name": "resourceId",
-        "type": "bytes32"
-      }
-    ],
-    "name": "ResourceNotFound",
     "type": "error"
   },
   {
@@ -280,12 +280,12 @@ export const NotareumVerificationEngineABI = [
       {
         "indexed": true,
         "internalType": "bytes32",
-        "name": "resourceId",
+        "name": "notaId",
         "type": "bytes32"
       },
       {
         "indexed": false,
-        "internalType": "enum NotareumVerificationEngine.VerificationLevel",
+        "internalType": "enum VerificationLevel",
         "name": "level",
         "type": "uint8"
       },
@@ -317,7 +317,7 @@ export const NotareumVerificationEngineABI = [
       {
         "indexed": true,
         "internalType": "bytes32",
-        "name": "resourceId",
+        "name": "notaId",
         "type": "bytes32"
       },
       {
@@ -502,7 +502,7 @@ export const NotareumVerificationEngineABI = [
     "inputs": [
       {
         "internalType": "bytes32",
-        "name": "resourceId",
+        "name": "notaId",
         "type": "bytes32"
       }
     ],
@@ -546,11 +546,11 @@ export const NotareumVerificationEngineABI = [
         "components": [
           {
             "internalType": "bytes32",
-            "name": "resourceId",
+            "name": "notaId",
             "type": "bytes32"
           },
           {
-            "internalType": "enum NotareumVerificationEngine.VerificationLevel",
+            "internalType": "enum VerificationLevel",
             "name": "level",
             "type": "uint8"
           },
@@ -651,11 +651,11 @@ export const NotareumVerificationEngineABI = [
     "inputs": [
       {
         "internalType": "bytes32",
-        "name": "resourceId",
+        "name": "notaId",
         "type": "bytes32"
       },
       {
-        "internalType": "enum NotareumVerificationEngine.VerificationLevel",
+        "internalType": "enum VerificationLevel",
         "name": "level",
         "type": "uint8"
       }
@@ -714,7 +714,7 @@ export const NotareumVerificationEngineABI = [
     "inputs": [
       {
         "internalType": "bytes32",
-        "name": "resourceId",
+        "name": "notaId",
         "type": "bytes32"
       },
       {
