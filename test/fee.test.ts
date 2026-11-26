@@ -1,87 +1,59 @@
 /**
- * Tests for FeeClient.
+ * FeeClient against the real NotareumFeeManager ABI.
  */
 
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { FeeClient } from "../src/clients/fee.js";
-import { SignerRequiredError } from "../src/errors.js";
+import { beforeEach, describe, expect, it } from "vitest";
+import { NotareumFeeManagerABI } from "../src/abi/index.js";
+import { FeeClient, FeeType } from "../src/clients/fee.js";
+import { ContractCallError, SignerRequiredError } from "../src/errors.js";
+import { ADDRESSES, ISSUER, deployProtocol } from "./helpers/protocol.js";
+import type { Protocol } from "./helpers/protocol.js";
 
-vi.mock("ethers", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("ethers")>();
-  return {
-    ...actual,
-    Contract: vi.fn().mockImplementation(() => ({
-      getVerificationFee: vi.fn().mockResolvedValue(100n * 10n ** 18n),
-      aliasFee: vi.fn().mockResolvedValue(50n * 10n ** 18n),
-      disputeBond: vi.fn().mockResolvedValue(500n * 10n ** 18n),
-      feeCollector: vi.fn().mockResolvedValue("0xcollector"),
-      setVerificationFee: vi.fn().mockResolvedValue({ hash: "0xsetfeehash" }),
-      setAliasFee: vi.fn().mockResolvedValue({ hash: "0xsetaliafeehash" }),
-    })),
-  };
+const NOTA = 10n ** 18n;
+
+let protocol: Protocol;
+let reader: FeeClient;
+let client: FeeClient;
+
+beforeEach(() => {
+  protocol = deployProtocol();
+  reader = new FeeClient(ADDRESSES.feeManager, protocol.node);
+  client = new FeeClient(ADDRESSES.feeManager, protocol.node, protocol.wallet());
 });
 
-const mockProvider = {} as unknown as import("ethers").Provider;
-const mockSigner = {} as unknown as import("ethers").Signer;
-const contractAddress = "0x" + "04".repeat(20);
-
-describe("FeeClient (read-only)", () => {
-  let client: FeeClient;
-
-  beforeEach(() => {
-    client = new FeeClient(contractAddress, mockProvider);
+describe("FeeClient", () => {
+  it("calls only functions the fee manager has", () => {
+    const functions = NotareumFeeManagerABI.filter((f) => f.type === "function").map((f) => f.name);
+    for (const invented of ["getVerificationFee", "aliasFee", "disputeBond", "feeCollector", "setAliasFee"]) {
+      expect(functions).not.toContain(invented);
+    }
   });
 
-  it("getVerificationFee() returns bigint", async () => {
-    const fee = await client.getVerificationFee(0);
-    expect(fee).toBe(100n * 10n ** 18n);
+  it("reads the split and what is pending", async () => {
+    expect(await reader.getFeeConfig()).toEqual({
+      burnRate: 1000n,
+      treasuryRate: 2000n,
+      treasury: ISSUER,
+      burnAddress: "0x000000000000000000000000000000000000dEaD",
+      pendingFees: 42n * NOTA,
+    });
+    expect(await reader.getFeesCollected(FeeType.ALIAS_REGISTRATION)).toBe(8n * NOTA);
+    expect(await reader.getPendingReward(ISSUER)).toBe(5n * NOTA);
   });
 
-  it("getAliasFee() returns bigint", async () => {
-    const fee = await client.getAliasFee();
-    expect(fee).toBe(50n * 10n ** 18n);
+  it("writes with a signer and decodes reverts", async () => {
+    expect(await client.setBurnRate(1500n)).toMatch(/^0x[0-9a-f]{64}$/);
+    expect((await reader.getFeeConfig()).burnRate).toBe(1500n);
+    expect(await client.setTreasuryRate(2500n)).toMatch(/^0x[0-9a-f]{64}$/);
+    expect(await client.claimReward()).toMatch(/^0x[0-9a-f]{64}$/);
+
+    const failure = await client.setBurnRate(9000n).catch((e) => e);
+    expect(failure).toBeInstanceOf(ContractCallError);
+    expect(failure).toMatchObject({ revertName: "RateExceedsMax", revertArgs: [9000n, 5000n] });
   });
 
-  it("getDisputeBond() returns bigint", async () => {
-    const bond = await client.getDisputeBond();
-    expect(bond).toBe(500n * 10n ** 18n);
-  });
-
-  it("getFeeCollector() returns address string", async () => {
-    const collector = await client.getFeeCollector();
-    expect(collector).toBe("0xcollector");
-  });
-
-  it("getFeeConfig() returns all fee fields", async () => {
-    const config = await client.getFeeConfig();
-    expect(config.verificationFee).toBeDefined();
-    expect(config.aliasFee).toBeDefined();
-    expect(config.disputeBond).toBeDefined();
-    expect(config.feeCollector).toBe("0xcollector");
-  });
-});
-
-describe("FeeClient (write ops)", () => {
-  let client: FeeClient;
-
-  beforeEach(() => {
-    client = new FeeClient(contractAddress, mockProvider, mockSigner);
-  });
-
-  it("setVerificationFee() returns tx hash", async () => {
-    const hash = await client.setVerificationFee(0, 200n * 10n ** 18n);
-    expect(hash).toBe("0xsetfeehash");
-  });
-
-  it("setAliasFee() returns tx hash", async () => {
-    const hash = await client.setAliasFee(75n * 10n ** 18n);
-    expect(hash).toBe("0xsetaliafeehash");
-  });
-});
-
-describe("FeeClient (signer guard)", () => {
-  it("setVerificationFee() throws SignerRequiredError without signer", async () => {
-    const client = new FeeClient(contractAddress, mockProvider);
-    await expect(client.setVerificationFee(0, 1n)).rejects.toBeInstanceOf(SignerRequiredError);
+  it("guards writes behind a signer", async () => {
+    await expect(reader.claimReward()).rejects.toBeInstanceOf(SignerRequiredError);
+    await expect(reader.setBurnRate(1n)).rejects.toBeInstanceOf(SignerRequiredError);
   });
 });

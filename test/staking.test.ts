@@ -1,112 +1,137 @@
 /**
- * Tests for StakingClient.
+ * StakingClient against the real NotareumValidatorStaking ABI.
  */
 
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { StakingClient, ValidatorTier } from "../src/clients/staking.js";
-import { SignerRequiredError } from "../src/errors.js";
+import { beforeEach, describe, expect, it } from "vitest";
+import { NotareumValidatorStakingABI } from "../src/abi/index.js";
+import { StakingClient } from "../src/clients/staking.js";
+import { StakingTier } from "../src/core/index.js";
+import { ContractCallError, SignerRequiredError } from "../src/errors.js";
+import { ADDRESSES, ISSUER, OTHER, deployProtocol } from "./helpers/protocol.js";
+import type { Protocol } from "./helpers/protocol.js";
 
-vi.mock("ethers", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("ethers")>();
-  return {
-    ...actual,
-    Contract: vi.fn().mockImplementation(() => ({
-      stake: vi.fn().mockResolvedValue({ hash: "0xstakehash" }),
-      unstake: vi.fn().mockResolvedValue({ hash: "0xunstakehash" }),
-      claimStake: vi.fn().mockResolvedValue({ hash: "0xclaimhash" }),
-      getValidator: vi.fn().mockResolvedValue({
-        stakedAmount: 50000n * 10n ** 18n,
-        tier: 2n,
-        isActive: true,
-        slashCount: 0n,
-        dailyVerifications: 10n,
-        lastVerificationDay: 19000n,
-        unbondingAmount: 0n,
-        unbondingEndTime: 0n,
-      }),
-      getTier: vi.fn().mockResolvedValue(2n),
-      getDailyVerificationsRemaining: vi.fn().mockResolvedValue(90n),
-      TIER_THRESHOLDS: vi.fn().mockResolvedValue(10000n * 10n ** 18n),
-    })),
-  };
+const NOTA = 10n ** 18n;
+
+let protocol: Protocol;
+let reader: StakingClient;
+let client: StakingClient;
+
+beforeEach(() => {
+  protocol = deployProtocol();
+  reader = new StakingClient(ADDRESSES.validatorStaking, protocol.node);
+  client = new StakingClient(ADDRESSES.validatorStaking, protocol.node, protocol.wallet());
 });
 
-const mockProvider = {} as unknown as import("ethers").Provider;
-const mockSigner = {} as unknown as import("ethers").Signer;
-const address = "0x" + "02".repeat(20);
-const validatorAddr = "0x" + "ff".repeat(20);
-
-describe("StakingClient (read-only)", () => {
-  let client: StakingClient;
-
-  beforeEach(() => {
-    client = new StakingClient(address, mockProvider);
-  });
-
-  it("getValidatorInfo() returns ValidatorInfo", async () => {
-    const info = await client.getValidatorInfo(validatorAddr);
-    expect(info.tier).toBe(ValidatorTier.SILVER);
-    expect(info.isActive).toBe(true);
-    expect(info.stakedAmount).toBe(50000n * 10n ** 18n);
-  });
-
-  it("getTier() returns a ValidatorTier", async () => {
-    const tier = await client.getTier(validatorAddr);
-    expect(tier).toBe(ValidatorTier.SILVER);
-  });
-
-  it("getDailyVerificationsRemaining() returns bigint", async () => {
-    const remaining = await client.getDailyVerificationsRemaining(validatorAddr);
-    expect(remaining).toBe(90n);
-  });
-
-  it("getTierThreshold() returns bigint", async () => {
-    const threshold = await client.getTierThreshold(ValidatorTier.BRONZE);
-    expect(threshold).toBeGreaterThan(0n);
+describe("the contract's real surface", () => {
+  it("has the functions the client calls and none of the ones v1.0 of this SDK invented", () => {
+    const functions = NotareumValidatorStakingABI.filter((f) => f.type === "function").map((f) => f.name);
+    expect(functions).toEqual(
+      expect.arrayContaining([
+        "stake",
+        "requestUnstake",
+        "completeUnstake",
+        "claimRewards",
+        "getValidatorInfo",
+        "getUnbondingRequests",
+        "isValidator",
+        "slashRateForTier",
+      ])
+    );
+    for (const invented of ["getValidator", "unstake", "claimStake", "getTier", "TIER_THRESHOLDS"]) {
+      expect(functions).not.toContain(invented);
+    }
   });
 });
 
-describe("StakingClient (write ops)", () => {
-  let client: StakingClient;
-
-  beforeEach(() => {
-    client = new StakingClient(address, mockProvider, mockSigner);
+describe("staking", () => {
+  it("reports an account that never staked as tier NONE", async () => {
+    expect(await reader.getValidatorInfo(OTHER)).toEqual({
+      stakedAmount: 0n,
+      tier: StakingTier.NONE,
+      accuracyNumerator: 0n,
+      accuracyDenominator: 0n,
+      verificationCount: 0n,
+      rewardsAccrued: 0n,
+      dailyVerifications: 0n,
+      lastResetDay: 0n,
+    });
+    expect(await reader.isValidator(OTHER)).toBe(false);
+    expect(await reader.getTier(OTHER)).toBe(StakingTier.NONE);
   });
 
-  it("stake() returns tx hash", async () => {
-    const hash = await client.stake(10000n * 10n ** 18n);
-    expect(hash).toBe("0xstakehash");
+  it("stakes, after the allowance is in place", async () => {
+    await expect(client.stake(50_000n * NOTA)).rejects.toMatchObject({ revertName: "ERC20InsufficientAllowance" });
+    protocol.approve(ISSUER, ADDRESSES.validatorStaking, 50_000n * NOTA);
+    expect(await client.stake(50_000n * NOTA)).toMatch(/^0x[0-9a-f]{64}$/);
+    expect(await reader.getValidatorInfo(ISSUER)).toMatchObject({
+      stakedAmount: 50_000n * NOTA,
+      tier: StakingTier.PROFESSIONAL,
+    });
+    expect(await reader.isValidator(ISSUER)).toBe(true);
   });
 
-  it("unstake() returns tx hash", async () => {
-    const hash = await client.unstake();
-    expect(hash).toBe("0xunstakehash");
+  it("decodes the minimum-stake revert", async () => {
+    const failure = await client.stake(5n * NOTA).catch((e) => e);
+    expect(failure).toBeInstanceOf(ContractCallError);
+    expect(failure).toMatchObject({ revertName: "BelowMinimumStake", revertArgs: [5n * NOTA, 10_000n * NOTA] });
   });
 
-  it("claimStake() returns tx hash", async () => {
-    const hash = await client.claimStake();
-    expect(hash).toBe("0xclaimhash");
+  it("unbonds by amount and completes after the release time", async () => {
+    protocol.approve(ISSUER, ADDRESSES.validatorStaking, 60_000n * NOTA);
+    await client.stake(60_000n * NOTA);
+    await client.requestUnstake(20_000n * NOTA);
+
+    expect((await reader.getValidatorInfo(ISSUER)).stakedAmount).toBe(40_000n * NOTA);
+    const [request] = await reader.getUnbondingRequests(ISSUER);
+    expect(request).toEqual({
+      index: 0,
+      amount: 20_000n * NOTA,
+      releaseTime: BigInt(protocol.node.timestamp + 14 * 86_400),
+      claimed: false,
+    });
+
+    await expect(client.completeUnstake()).rejects.toMatchObject({ revertName: "NothingToClaim" });
+    protocol.node.mine((14 * 86_400) / protocol.node.blockTime + 1);
+    await client.completeUnstake();
+    expect((await reader.getUnbondingRequests(ISSUER))[0].claimed).toBe(true);
+  });
+
+  it("refuses to unstake more than is staked", async () => {
+    await expect(client.requestUnstake(1n)).rejects.toMatchObject({ revertName: "NotAValidator" });
+    await expect(client.claimRewards()).rejects.toMatchObject({ revertName: "NothingToClaim" });
+  });
+
+  it("guards writes behind a signer", async () => {
+    await expect(reader.stake(1n)).rejects.toBeInstanceOf(SignerRequiredError);
+    await expect(reader.requestUnstake(1n)).rejects.toBeInstanceOf(SignerRequiredError);
+    await expect(reader.completeUnstake()).rejects.toBeInstanceOf(SignerRequiredError);
+    await expect(reader.claimRewards()).rejects.toBeInstanceOf(SignerRequiredError);
   });
 });
 
-describe("StakingClient (signer guard)", () => {
-  it("stake() throws SignerRequiredError without signer", async () => {
-    const client = new StakingClient(address, mockProvider);
-    await expect(client.stake(1n)).rejects.toBeInstanceOf(SignerRequiredError);
+describe("tiers", () => {
+  it("knows the tier minimums and slash rates", async () => {
+    expect(reader.getTierMinimum(StakingTier.NONE)).toBeNull();
+    expect(reader.getTierMinimum(StakingTier.BASIC)).toBe(10_000n * NOTA);
+    expect(reader.getTierMinimum(StakingTier.INSTITUTIONAL)).toBe(1_000_000n * NOTA);
+    expect(await reader.getSlashRate(StakingTier.ENTERPRISE)).toBe(5000n);
   });
 
-  it("unstake() throws SignerRequiredError without signer", async () => {
-    const client = new StakingClient(address, mockProvider);
-    await expect(client.unstake()).rejects.toBeInstanceOf(SignerRequiredError);
-  });
-});
+  it("counts the attestations left today the way the contract resets them", async () => {
+    const today = BigInt(Math.floor(protocol.node.timestamp / 86_400));
+    protocol.validators.set(ISSUER.toLowerCase(), {
+      stakedAmount: 10_000n * NOTA,
+      dailyVerifications: 40n,
+      lastResetDay: today,
+    });
+    expect(await reader.getDailyVerificationsRemaining(ISSUER)).toBe(60n);
 
-describe("ValidatorTier enum values", () => {
-  it("has correct numeric values", () => {
-    expect(ValidatorTier.NONE).toBe(0);
-    expect(ValidatorTier.BRONZE).toBe(1);
-    expect(ValidatorTier.SILVER).toBe(2);
-    expect(ValidatorTier.GOLD).toBe(3);
-    expect(ValidatorTier.PLATINUM).toBe(4);
+    // Yesterday's count no longer applies.
+    protocol.validators.get(ISSUER.toLowerCase())!.lastResetDay = today - 1n;
+    expect(await reader.getDailyVerificationsRemaining(ISSUER)).toBe(100n);
+
+    protocol.validators.get(ISSUER.toLowerCase())!.stakedAmount = 1_000_000n * NOTA;
+    expect(await reader.getDailyVerificationsRemaining(ISSUER)).toBeNull();
+    expect(await reader.getDailyVerificationsRemaining(OTHER)).toBe(0n);
   });
 });
