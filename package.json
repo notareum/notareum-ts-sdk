@@ -1,7 +1,7 @@
 {
   "name": "@notareum/sdk",
   "version": "1.0.0",
-  "description": "Official TypeScript SDK for the Notareum Protocol -- .nota files, on-chain registry, verification, staking, governance, and fees.",
+  "description": "Official TypeScript SDK for the Notareum Protocol v1.1 -- mint and read .nota files, the on-chain registry, social verification, staking, governance, and fees.",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
