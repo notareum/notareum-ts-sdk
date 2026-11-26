@@ -1,5 +1,5 @@
 /**
- * Signature verification utilities.
+ * Legacy v1.0 signature verification utilities.
  *
  * Recovers the signing address from an EIP-191 personal sign signature
  * and checks it against an expected address.
@@ -7,7 +7,7 @@
 
 import { verifyMessage } from "ethers";
 import { NotaSignatureError } from "../errors.js";
-import type { NotaFile } from "../nota/types.js";
+import type { NotaFile } from "./types.js";
 
 /**
  * Recovers the address that signed a message using EIP-191 personal sign.

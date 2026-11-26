@@ -4,9 +4,9 @@ import {
   recoverSignerAddress,
   verifySignature,
   verifyNotaSignature,
-} from "../../../src/core/crypto/verifier.js";
+} from "../../../src/core/legacy/verifier.js";
 import { NotaSignatureError } from "../../../src/core/errors.js";
-import type { NotaFile } from "../../../src/core/nota/types.js";
+import type { NotaFile } from "../../../src/core/legacy/types.js";
 
 const TEST_PRIVATE_KEY =
   "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80";

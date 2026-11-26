@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
-import { parseNota, serializeNota } from "../../../src/core/nota/parser.js";
+import { parseNota, serializeNota } from "../../../src/core/legacy/parser.js";
 import { NotaParseError } from "../../../src/core/errors.js";
-import type { NotaFile } from "../../../src/core/nota/types.js";
+import type { NotaFile } from "../../../src/core/legacy/types.js";
 
 const validNotaJson: NotaFile = {
   version: "1.0",

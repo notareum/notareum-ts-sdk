@@ -1,8 +1,9 @@
 /**
- * .nota file parser.
+ * Legacy v1.0 `.nota` JSON document parser.
  *
- * Parses a JSON string into a NotaFile object with structural validation.
- * For full semantic validation, use the validator module.
+ * Parses a JSON string into a v1.0 NotaFile object with structural validation.
+ * A v1.0 document is not a v1.1 `.nota` file; use `importLegacyNota` to map
+ * one onto a v1.1 draft.
  */
 
 import { NotaParseError } from "../errors.js";

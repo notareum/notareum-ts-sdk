@@ -1,18 +1,16 @@
 /**
- * .nota file validator.
+ * Legacy v1.0 `.nota` JSON document validator.
  *
- * Performs semantic validation on a parsed NotaFile.
+ * Performs semantic validation on a parsed v1.0 NotaFile.
  */
 
 import {
-  NOTA_SCHEMA_VERSION,
+  NOTA_LEGACY_SCHEMA_VERSION,
   NOTA_MAX_METADATA_BYTES,
 } from "../constants.js";
 import { NotaValidationError } from "../errors.js";
 import type { NotaFile } from "./types.js";
-import {
-  isValidResourceType,
-} from "./types.js";
+import { isValidResourceType } from "../nota/types.js";
 
 const VALID_STATUSES = ["unverified", "pending", "verified", "disputed", "revoked"];
 const VALID_LEVELS = ["basic", "enhanced", "institutional"];
@@ -27,10 +25,10 @@ const VALID_CURVES = ["secp256k1", "ed25519"];
  */
 export function validateNota(nota: NotaFile): void {
   // version
-  if (nota.version !== NOTA_SCHEMA_VERSION) {
+  if (nota.version !== NOTA_LEGACY_SCHEMA_VERSION) {
     throw new NotaValidationError(
       "version",
-      `Unsupported version "${nota.version}". Expected "${NOTA_SCHEMA_VERSION}".`
+      `Unsupported version "${nota.version}". Expected "${NOTA_LEGACY_SCHEMA_VERSION}".`
     );
   }
 

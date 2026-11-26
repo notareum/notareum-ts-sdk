@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
-import { validateNota, isValidNota } from "../../../src/core/nota/validator.js";
+import { validateNota, isValidNota } from "../../../src/core/legacy/validator.js";
 import { NotaValidationError } from "../../../src/core/errors.js";
-import type { NotaFile } from "../../../src/core/nota/types.js";
+import type { NotaFile } from "../../../src/core/legacy/types.js";
 
 function makeValidNota(): NotaFile {
   return {

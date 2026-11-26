@@ -1,9 +1,9 @@
 import { describe, it, expect } from "vitest";
 import { Wallet } from "ethers";
-import { signNota, signMessage, buildSigningMessage } from "../../../src/core/crypto/signer.js";
-import { verifySignature, recoverSignerAddress } from "../../../src/core/crypto/verifier.js";
+import { signNota, signMessage, buildSigningMessage } from "../../../src/core/legacy/signer.js";
+import { verifySignature, recoverSignerAddress } from "../../../src/core/legacy/verifier.js";
 import { NotaSignatureError } from "../../../src/core/errors.js";
-import type { NotaFile } from "../../../src/core/nota/types.js";
+import type { NotaFile } from "../../../src/core/legacy/types.js";
 
 // Test wallet with known private key (NOT for production use)
 const TEST_PRIVATE_KEY =

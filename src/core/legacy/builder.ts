@@ -1,10 +1,11 @@
 /**
- * .nota file builder.
+ * Legacy v1.0 `.nota` JSON document builder.
  *
- * Builds NotaFile objects programmatically with sensible defaults.
+ * Builds v1.0 NotaFile objects. Kept for tooling that still handles v1.0
+ * documents; new files are minted and written with the v1.1 API.
  */
 
-import { NOTA_SCHEMA_VERSION } from "../constants.js";
+import { NOTA_LEGACY_SCHEMA_VERSION } from "../constants.js";
 import type {
   NotaFile,
   NotaMetadata,
@@ -29,7 +30,7 @@ export function buildNota(
   verification?: NotaVerification
 ): NotaFile {
   const nota: NotaFile = {
-    version: NOTA_SCHEMA_VERSION,
+    version: NOTA_LEGACY_SCHEMA_VERSION,
     type: meta.type,
     chain: {
       name: meta.chainName,
@@ -73,7 +74,7 @@ export function buildNota(
  */
 export function buildUnsignedNota(meta: NotaMetadata): Omit<NotaFile, "signature"> {
   return {
-    version: NOTA_SCHEMA_VERSION,
+    version: NOTA_LEGACY_SCHEMA_VERSION,
     type: meta.type,
     chain: {
       name: meta.chainName,

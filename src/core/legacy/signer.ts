@@ -1,15 +1,18 @@
 /**
- * EIP-191 personal sign for .nota files.
+ * Legacy v1.0 signing: EIP-191 personal sign over the resource only.
+ * v1.1 signs the whole content layer as EIP-712 typed data (crypto/eip712.ts).
+ *
+ * EIP-191 personal sign for v1.0 .nota documents.
  *
  * Signs the canonical message derived from a NotaFile using ethers v6
  * personal sign (eth_sign / personal_sign). The message format uses
- * NOTA_SIGNATURE_PREFIX to namespace the payload.
+ * NOTA_LEGACY_SIGNATURE_PREFIX to namespace the payload.
  */
 
 import { Wallet, getBytes, hashMessage } from "ethers";
-import { NOTA_SIGNATURE_PREFIX } from "../constants.js";
+import { NOTA_LEGACY_SIGNATURE_PREFIX } from "../constants.js";
 import { NotaSignatureError } from "../errors.js";
-import type { NotaFile, NotaSignature } from "../nota/types.js";
+import type { NotaFile, NotaSignature } from "./types.js";
 
 /**
  * Builds the canonical signing message for a .nota file.
@@ -17,7 +20,7 @@ import type { NotaFile, NotaSignature } from "../nota/types.js";
  */
 export function buildSigningMessage(nota: Omit<NotaFile, "signature">): string {
   const { type, chain, resource } = nota;
-  return `${NOTA_SIGNATURE_PREFIX}${type}:${chain.chainId}:${resource.identifier}`;
+  return `${NOTA_LEGACY_SIGNATURE_PREFIX}${type}:${chain.chainId}:${resource.identifier}`;
 }
 
 /**

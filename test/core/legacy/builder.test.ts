@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { buildNota, buildUnsignedNota } from "../../../src/core/nota/builder.js";
-import type { NotaMetadata, NotaSignature } from "../../../src/core/nota/types.js";
+import { buildNota, buildUnsignedNota } from "../../../src/core/legacy/builder.js";
+import type { NotaMetadata, NotaSignature } from "../../../src/core/legacy/types.js";
 
 const baseMeta: NotaMetadata = {
   type: "address",
