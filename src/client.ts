@@ -20,13 +20,19 @@
  *   }
  * });
  *
- * // .nota file operations
- * const nota = ntm.nota.create({ type: "address", chainId: 1, chainName: "ethereum", identifier: "0x..." });
- * const signed = await nota.sign(signer);
- * console.log(signed.serialize());
+ * // Create a .nota file by minting it
+ * const minted = await ntm.nota.create({
+ *   type: "address",
+ *   chainName: "ethereum",
+ *   chainId: 1,
+ *   identifier: await signer.getAddress(),
+ *   name: "Treasury",
+ * });
+ * await writeFile(minted.fileName, minted.file);
  *
- * // On-chain registry
- * await ntm.registry.registerResource(0, 1n, "0x...", "0x" + "00".repeat(32));
+ * // Read one back and establish what may be said about it
+ * const { file, standing } = await ntm.nota.verify(bytes);
+ * console.log(standing.label); // "Registered. Not socially verified."
  *
  * // Staking
  * await ntm.staking.stake(10_000n * 10n ** 18n);
@@ -46,17 +52,17 @@ import type { ClientConfig } from "./types.js";
 
 /** The unified Notareum SDK instance. */
 export interface NotareumInstance {
-  /** .nota file operations (create, sign, parse, validate, serialize). */
+  /** `.nota` files: compose, sign, mint, read, verify, import legacy documents. */
   readonly nota: NotaFileClient;
-  /** On-chain resource registry (register, resolve, revoke, resource types). */
+  /** The on-chain registry of minted files: mint, records, aliases, revocation. */
   readonly registry: RegistryClient;
-  /** Verification requests and attestations. */
+  /** Social verification: requests and validator attestations, by `notaId`. */
   readonly verification: VerificationClient;
-  /** Validator staking (stake, unstake, tier info). */
+  /** Validator staking (stake, unbond, rewards, tier info). */
   readonly staking: StakingClient;
-  /** veNOTA governance (lock, unlock, voting power). */
+  /** veNOTA governance (locks as NFTs, voting power). */
   readonly governance: GovernanceClient;
-  /** Protocol fee queries and configuration. */
+  /** Fee distribution (burn and treasury split, validator rewards). */
   readonly fee: FeeClient;
 }
 
@@ -69,9 +75,15 @@ export interface NotareumInstance {
 export function Notareum(config: ClientConfig): NotareumInstance {
   const { provider, signer, contracts } = config;
 
+  const registry = new RegistryClient(contracts.notaRegistry, provider, signer, {
+    conformanceGate: contracts.conformanceGate,
+    confirmations: config.confirmations,
+    pollingInterval: config.pollingInterval,
+  });
+
   return {
-    nota: new NotaFileClient(),
-    registry: new RegistryClient(contracts.notaRegistry, provider, signer),
+    nota: new NotaFileClient(registry, { signer, trustedRegistries: config.trustedRegistries }),
+    registry,
     verification: new VerificationClient(contracts.verificationEngine, provider, signer),
     staking: new StakingClient(contracts.validatorStaking, provider, signer),
     governance: new GovernanceClient(contracts.veNota, provider, signer),
