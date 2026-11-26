@@ -27,6 +27,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "lint": "tsc --noEmit",
+    "sync": "node scripts/sync-protocol.mjs",
     "prepublishOnly": "npm run clean && npm run lint && npm run test && npm run build"
   },
   "license": "MIT",
